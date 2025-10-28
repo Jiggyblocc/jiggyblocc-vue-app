@@ -3,16 +3,16 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTicketStore } from '../stores/ticketStore';
 import TicketForm from '../components/TicketForm.vue';
-import { TICKET_STATUSES } from '../data/mockTickets';
+// Note: TICKET_STATUSES is imported here only if needed for display in the form options, 
+// but typically it's enough to just be in the mockTickets file or the store.
+// import { TICKET_STATUSES } from '../data/mockTickets'; 
 
 const route = useRoute();
 const router = useRouter();
 const ticketStore = useTicketStore();
 
 // --- State ---
-// Translates the 'view' vs 'edit' mode state from React
 const isEditing = ref(false); 
-// Holds the data for the current ticket
 const currentTicket = ref(null);
 
 // --- Computed ---
@@ -21,14 +21,14 @@ const isNewTicket = computed(() => ticketId.value === 'new');
 
 // --- Functions ---
 
-// 1. Fetching logic (translates finding the ticket in React's useEffect)
 const loadTicket = () => {
     if (isNewTicket.value) {
         // C-reate mode: Start with an empty form
         currentTicket.value = null; 
-        isEditing.value = true;
+        isEditing.value = true; // 🚨 MUST be true to show the form 
     } else {
         // R-ead/U-pdate mode: Find the ticket in the store
+        // Use a getter or direct find from the store's reactive state
         const foundTicket = ticketStore.tickets.find(t => t.id === Number(ticketId.value));
         
         if (foundTicket) {
@@ -41,9 +41,8 @@ const loadTicket = () => {
     }
 };
 
-// 2. Submission Handler (C/U in CRUD)
+// Submission Handler (C/U in CRUD)
 const handleFormSubmit = (formData) => {
-    // This logic translates the state update/add logic from your React controller
     
     // In a new ticket scenario (C-reate)
     if (isNewTicket.value) {
@@ -51,36 +50,35 @@ const handleFormSubmit = (formData) => {
         const newTicket = { 
             ...formData, 
             id: newId, 
-            // Ensures correct ID is used if the form used a temporary one
             dateCreated: new Date().toISOString().substring(0, 10),
-            // Default other fields if needed
         };
-        ticketStore.tickets.push(newTicket); // Add to the mutable store list
+        // Add to the mutable store list
+        ticketStore.tickets.push(newTicket); 
+        
+        // Use placeholder alert (needs to be replaced by a proper toast system)
+        alert(`New ticket #${newId} created successfully!`);
         
         // Redirect to the newly created ticket's detail page
         router.push(`/tickets/${newId}`);
     } 
     // In an existing ticket scenario (U-pdate)
     else {
-        ticketStore.saveTicket(formData); // Use the placeholder action in the store
+        // 🚨 FIXED: Rely on the store action for the array update logic
+        ticketStore.saveTicket(formData); 
         
-        // Find and update the ticket in the store list directly for the blueprint:
-        const index = ticketStore.tickets.findIndex(t => t.id === formData.id);
-        if (index !== -1) {
-            // Vue: Update the mutable item in the reactive array
-            ticketStore.tickets[index] = formData; 
-        }
-        
-        currentTicket.value = formData; // Update local view state
+        // Update local view state
+        currentTicket.value = formData; 
         isEditing.value = false; // Switch back to View Mode
+        
+        // Use placeholder alert (needs to be replaced by a proper toast system)
         alert(`Ticket #${formData.id} saved successfully!`);
     }
 };
 
-// 3. Watch: Re-run loadTicket when the route parameter changes (e.g., from /tickets/1 to /tickets/2)
+// Watch: Re-run loadTicket when the route parameter changes 
 watch(ticketId, loadTicket);
 
-// 4. OnMounted: Run loadTicket when the component is first created
+// OnMounted: Run loadTicket when the component is first created
 onMounted(loadTicket);
 
 // Helper function for styling the status badge
@@ -150,6 +148,8 @@ const handleCancel = () => {
 /* CSS to ensure identical detail/view styling */
 .ticket-detail-container {
   padding: 40px 20px;
+  max-width: var(--max-content-width, 1440px); /* Use global width if defined */
+  margin: 0 auto;
 }
 
 .back-button {
@@ -161,7 +161,7 @@ const handleCancel = () => {
   cursor: pointer;
   transition: color 0.2s;
   margin-bottom: 20px;
-  display: block; /* Important for alignment */
+  display: block; 
 }
 
 .back-button:hover {
@@ -242,7 +242,7 @@ const handleCancel = () => {
   border-radius: 8px;
   line-height: 1.6;
   color: #374151;
-  white-space: pre-wrap; /* Preserves formatting */
+  white-space: pre-wrap;
 }
 
 /* Status Badge Styling (Mirrored from the list page) */
@@ -256,7 +256,18 @@ const handleCancel = () => {
   text-transform: uppercase;
 }
 
-.status-open { background-color: #ef4444; } 
-.status-in-progress { background-color: #f59e0b; }
-.status-closed { background-color: #10b981; }
+/* Use color rules from the blueprint: open (green), in_progress (amber), closed (gray) */
+.status-open { background-color: #10b981; } /* Green tone */
+.status-in-progress { background-color: #f59e0b; } /* Amber tone */
+.status-closed { background-color: #9ca3af; } /* Gray tone */
+
+@media (max-width: 600px) {
+    .detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .edit-button {
+        margin-top: 15px;
+    }
+}
 </style>

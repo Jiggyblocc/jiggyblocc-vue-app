@@ -1,5 +1,12 @@
-# Vue 3 + Vite
-
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
-
-Learn more about IDE Support for Vue in the [Vue Docs Scaling up Guide](https://vuejs.org/guide/scaling-up/tooling.html#ide-support).
+🚀 TicketVue Pro: Vue.js Implementation
+This repository contains the complete Vue.js 3 implementation of the "TicketMaster Pro" management application. It showcases full CRUD functionality, Pinia state management, and protected routing, while strictly enforcing the required uniform design and accessibility standards.
+🛠️ Tech Stack & StructureCategoryFramework / LibraryNotesFrameworkVue 3 (Composition API)Used with <script setup> for clean component logic.StatePiniaOfficial state management for Authentication (authStore) and Ticket data (ticketStore).RoutingVue Router 4Enforces protected routes via Navigation Guards.Build ToolViteUsed for development and production bundling.StylingVanilla CSSUsed to enforce uniform design and color rules.
+UI Components and State Structure Explanation
+The application is structured into distinct Pages (e.g., DashboardPage.vue), reusable Components (e.g., TicketForm.vue), and Stores (Pinia modules). The ticketStore holds the mutable array of tickets, and its actions (saveTicket, deleteTicket) are used by the form and list components for all CRUD operations.
+⚙️ Setup and ExecutionPrerequisitesEnsure you have Node.js (v16+) and npm installed.StepsClone the Repository:Bashgit clone [YOUR_REPOSITORY_URL]
+cd vue-ticket-app
+Install Dependencies:Bashnpm install
+# or yarn install
+Run the App:Bashnpm run dev
+# or yarn dev
+The application will run locally (typically at http://localhost:5173).Instructions for Switching VersionsTo run a different version (e.g., React or Twig), you must first stop this Vue server (Ctrl+C or Cmd+C) and then navigate to the respective project directory to execute its unique startup command.🔒 Usage and Design ComplianceExample Test User CredentialsAuthentication is simulated via localStorage.FieldValueEmailtest@user.comPasswordpasswordSecurity and Validation NotesProtected Routes: Only authenticated users can access the Dashboard and Ticket Management screens, enforced by the ticketapp_session key in localStorage. Unauthorized access redirects to /auth/login.Logout: Clears the session and redirects to the landing page.Validation: title and status fields are mandatory. The status field strictly accepts only "open", "in_progress", or "closed". Validation errors are currently handled via inline HTML5 checks and JavaScript alerts.Design Consistency & AccessibilityThe UI strictly adheres to the mandated uniform design:Max Width: Content is centered with a max-width of $1440\text{px}$ (using a global CSS variable).Aesthetics: Includes the wavy SVG background in the hero section, multiple decorative circles, and uses box-shaped sections with shadows and rounded corners (cards).Responsiveness: The layout is fully responsive, adapting to mobile and tablet views.Color Rules:open → Green tonein_progress → Amber toneclosed → Gray toneAccessibility: Semantic HTML is used, and visible focus states are maintained.
